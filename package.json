@@ -1,12 +1,13 @@
 {
   "name": "advent-of-code-2016",
   "version": "1.0.0",
+  "author": "Marcio Oliveira <marciottlg@gmail.com>",
   "scripts": {
     "build": "babel src -d lib"
   },
   "devDependencies": {
-    "babel-cli": "^6.18.0",
-    "babel-plugin-transform-object-rest-spread": "^6.19.0",
-    "babel-preset-latest": "^6.16.0"
+    "babel-cli": "6.18.0",
+    "babel-plugin-transform-object-rest-spread": "6.19.0",
+    "babel-preset-latest": "6.16.0"
   }
 }
