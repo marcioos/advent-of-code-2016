@@ -2,33 +2,18 @@
  * Helper functions
  */
 
-const rotateLeft = (facingDirection) => {
-  switch (facingDirection) {
-    case 'N':
-      return 'W'
-    case 'E':
-      return 'N'
-    case 'S':
-      return 'E'
-    case 'W':
-      return 'S'
-  }
-  throw "Unknown direction: " + facingDirection
-}
+const north = { label: 'N', left: 'W', right: 'E' }
+const east = { label: 'E', left: 'N', right: 'S' }
+const south = { label: 'S', left: 'E', right: 'W' }
+const west = { label: 'W', left: 'S', right: 'N' }
 
-const rotateRight = (facingDirection) => {
-  switch (facingDirection) {
-    case 'N':
-      return 'E'
-    case 'E':
-      return 'S'
-    case 'S':
-      return 'W'
-    case 'W':
-      return 'N'
-  }
-  throw "Unknown direction: " + facingDirection
-}
+const directions = [north, east, south, west]
+
+const directionFromLabel = (label) => directions.filter((direction) => direction.label === label)[0]
+
+const rotateLeft = (facingDirection) => directionFromLabel(facingDirection).left
+
+const rotateRight = (facingDirection) => directionFromLabel(facingDirection).right
 
 const calculateRotation = (facingDirection, rotationSide) => {
   switch (rotationSide) {
@@ -40,79 +25,58 @@ const calculateRotation = (facingDirection, rotationSide) => {
   throw "Unknown side: " + rotationSide
 }
 
+const findPositionVisitedTwice = (state, originCoord, targetCoord, visited, coord) => {
+  var visitedTwice
+
+  for (let i = originCoord; i <= targetCoord; i++) {
+    const visitedPosition = { ...state.position }
+    visitedPosition[coord] = i
+    const visitedPositionAsString = JSON.stringify(visitedPosition)
+    if (state.visitedPositions.some((position) => position === visitedPositionAsString)) {
+      visitedTwice = visitedPosition
+    }
+    visited.push(visitedPositionAsString)
+  }
+  return visitedTwice
+}
+
 const calculateMovement = (state, distance) => {
   const visited = []
   var visitedTwice = state.firstPositionVisitedTwice
+  var newPosition
 
   switch (state.facing) {
     case 'N':
       if (visitedTwice === undefined) {
-        for (let i = state.position.y + 1; i <= state.position.y + distance; i++) {
-          const visitedPosition = { ...state.position, y: i }
-          const visitedPositionAsString = JSON.stringify(visitedPosition)
-          if (state.visitedPositions.some((position) => position === visitedPositionAsString)) {
-            visitedTwice = visitedPosition
-          }
-          visited.push(visitedPositionAsString)
-        }
+        visitedTwice = findPositionVisitedTwice(state, state.position.y + 1, state.position.y + distance, visited, 'y')
       }
-      return {
-        ...state,
-        position: {...state.position, y: state.position.y + distance},
-        visitedPositions: [...state.visitedPositions, ...visited],
-        firstPositionVisitedTwice: visitedTwice
-      }
+      newPosition = {...state.position, y: state.position.y + distance}
+      break
     case 'E':
       if (visitedTwice === undefined) {
-        for (let i = state.position.x + 1; i <= state.position.x + distance; i++) {
-          const visitedPosition = { ...state.position, x: i }
-          const visitedPositionAsString = JSON.stringify(visitedPosition)
-          if (state.visitedPositions.some((position) => position === visitedPositionAsString)) {
-            visitedTwice = visitedPosition
-          }
-          visited.push(visitedPositionAsString)
-        }
+        visitedTwice = findPositionVisitedTwice(state, state.position.x + 1, state.position.x + distance, visited, 'x')
       }
-      return {
-        ...state,
-        position: {...state.position, x: state.position.x + distance},
-        visitedPositions: [...state.visitedPositions, ...visited],
-        firstPositionVisitedTwice: visitedTwice
-      }
+      newPosition = {...state.position, x: state.position.x + distance}
+      break
     case 'S':
       if (visitedTwice === undefined) {
-        for (let i = state.position.y - 1; i >= state.position.y - distance; i--) {
-          const visitedPosition = { ...state.position, y: i }
-          const visitedPositionAsString = JSON.stringify(visitedPosition)
-          if (state.visitedPositions.some((position) => position === visitedPositionAsString)) {
-            visitedTwice = visitedPosition
-          }
-          visited.push(visitedPositionAsString)
-        }
+        visitedTwice = findPositionVisitedTwice(state, state.position.y - distance, state.position.y - 1, visited, 'y')
       }
-      return {
-        ...state,
-        position: {...state.position, y: state.position.y - distance},
-        visitedPositions: [...state.visitedPositions, ...visited],
-        firstPositionVisitedTwice: visitedTwice
-      }
+      newPosition = {...state.position, y: state.position.y - distance}
+      break
     case 'W':
       if (visitedTwice === undefined) {
-        for (let i = state.position.x - 1; i >= state.position.x - distance; i--) {
-          const visitedPosition = { ...state.position, x: i }
-          const visitedPositionAsString = JSON.stringify(visitedPosition)
-          if (state.visitedPositions.some((position) => position === visitedPositionAsString)) {
-            visitedTwice = visitedPosition
-          }
-          visited.push(visitedPositionAsString)
-        }
+        visitedTwice = findPositionVisitedTwice(state, state.position.x - distance, state.position.x - 1, visited, 'x')
       }
-      return {
-        ...state,
-        position: {...state.position, x: state.position.x - distance},
-        visitedPositions: [...state.visitedPositions, ...visited],
-        firstPositionVisitedTwice: visitedTwice
-      }
+      newPosition = {...state.position, x: state.position.x - distance}
+      break
+  }
+
+  return {
+    ...state,
+    position: newPosition,
+    visitedPositions: [...state.visitedPositions, ...visited],
+    firstPositionVisitedTwice: visitedTwice
   }
 }
 
@@ -157,6 +121,19 @@ const noTimeForTaxicab = (state = initialState, action) => {
 }
 
 /*
+ * Plumbing
+ */
+
+ const createStore = (reducer, initialState) => {
+   let state = initialState
+
+   return (action) => {
+       state = reducer(state, action)
+       return state
+   }
+ }
+
+/*
  * "main"
  */
 
@@ -171,18 +148,9 @@ const noTimeForTaxicab = (state = initialState, action) => {
                 'R1','L4','L4','R3','R5','L4','L1','L1','R4','L2','R5','R1','R1','R2','R1','R5',
                 'L1','L3','L5','R2']
 
-const createStore = (reducer, initialState) => {
-  let state = initialState
-
-  return (action) => {
-      state = reducer(state, action)
-      return state
-  }
-}
-
 const store = createStore(noTimeForTaxicab, initialState)
 
-let finalState = {}
+let finalState
 
 input.map((instruction) =>
   toActions(instruction).forEach(
@@ -192,5 +160,5 @@ input.map((instruction) =>
 
 const calculateDistanceToOrigin = (position) => Math.abs(position.x) + Math.abs(position.y)
 
-console.log(calculateDistanceToOrigin(finalState.position))
-console.log(calculateDistanceToOrigin(finalState.firstPositionVisitedTwice))
+console.log("#1 Distance to bunny HQ: " + calculateDistanceToOrigin(finalState.position))
+console.log("#2 Distance to bunny HQ: " + calculateDistanceToOrigin(finalState.firstPositionVisitedTwice))

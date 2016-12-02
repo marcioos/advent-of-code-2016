@@ -3,6 +3,5 @@
 My solutions for [Advent of Code 2016](http://adventofcode.com/2016) challenges. Java is the language I am more skilled in but I'll try to write everything in Javascript (ES6) since I'm about to shift to web development.
 
 ## Puzzles
-This table contains marking indicating if I had time to do the challenge of a certain day.
 
 * Day 1 - [No Time for a Taxicab](http://adventofcode.com/2016/day/1)
