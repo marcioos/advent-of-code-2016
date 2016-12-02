@@ -41,15 +41,78 @@ const calculateRotation = (facingDirection, rotationSide) => {
 }
 
 const calculateMovement = (state, distance) => {
+  const visited = []
+  var visitedTwice = state.firstPositionVisitedTwice
+
   switch (state.facing) {
     case 'N':
-      return {...state.position, y: state.position.y + distance}
+      if (visitedTwice === undefined) {
+        for (let i = state.position.y + 1; i <= state.position.y + distance; i++) {
+          const visitedPosition = { ...state.position, y: i }
+          const visitedPositionAsString = JSON.stringify(visitedPosition)
+          if (state.visitedPositions.some((position) => position === visitedPositionAsString)) {
+            visitedTwice = visitedPosition
+          }
+          visited.push(visitedPositionAsString)
+        }
+      }
+      return {
+        ...state,
+        position: {...state.position, y: state.position.y + distance},
+        visitedPositions: [...state.visitedPositions, ...visited],
+        firstPositionVisitedTwice: visitedTwice
+      }
     case 'E':
-      return {...state.position, x: state.position.x + distance}
+      if (visitedTwice === undefined) {
+        for (let i = state.position.x + 1; i <= state.position.x + distance; i++) {
+          const visitedPosition = { ...state.position, x: i }
+          const visitedPositionAsString = JSON.stringify(visitedPosition)
+          if (state.visitedPositions.some((position) => position === visitedPositionAsString)) {
+            visitedTwice = visitedPosition
+          }
+          visited.push(visitedPositionAsString)
+        }
+      }
+      return {
+        ...state,
+        position: {...state.position, x: state.position.x + distance},
+        visitedPositions: [...state.visitedPositions, ...visited],
+        firstPositionVisitedTwice: visitedTwice
+      }
     case 'S':
-      return {...state.position, y: state.position.y - distance}
+      if (visitedTwice === undefined) {
+        for (let i = state.position.y - 1; i >= state.position.y - distance; i--) {
+          const visitedPosition = { ...state.position, y: i }
+          const visitedPositionAsString = JSON.stringify(visitedPosition)
+          if (state.visitedPositions.some((position) => position === visitedPositionAsString)) {
+            visitedTwice = visitedPosition
+          }
+          visited.push(visitedPositionAsString)
+        }
+      }
+      return {
+        ...state,
+        position: {...state.position, y: state.position.y - distance},
+        visitedPositions: [...state.visitedPositions, ...visited],
+        firstPositionVisitedTwice: visitedTwice
+      }
     case 'W':
-      return {...state.position, x: state.position.x - distance}
+      if (visitedTwice === undefined) {
+        for (let i = state.position.x - 1; i >= state.position.x - distance; i--) {
+          const visitedPosition = { ...state.position, x: i }
+          const visitedPositionAsString = JSON.stringify(visitedPosition)
+          if (state.visitedPositions.some((position) => position === visitedPositionAsString)) {
+            visitedTwice = visitedPosition
+          }
+          visited.push(visitedPositionAsString)
+        }
+      }
+      return {
+        ...state,
+        position: {...state.position, x: state.position.x - distance},
+        visitedPositions: [...state.visitedPositions, ...visited],
+        firstPositionVisitedTwice: visitedTwice
+      }
   }
 }
 
@@ -77,7 +140,9 @@ const initialState = {
     x: 0,
     y: 0,
   },
-  facing: 'N'
+  facing: 'N',
+  visitedPositions: [],
+  firstPositionVisitedTwice: undefined
 }
 
 const noTimeForTaxicab = (state = initialState, action) => {
@@ -85,7 +150,7 @@ const noTimeForTaxicab = (state = initialState, action) => {
     case 'ROTATE':
       return {...state, facing: calculateRotation(state.facing, action.side)}
     case 'MOVE':
-      return {...state, position: calculateMovement(state, action.distance)}
+      return calculateMovement(state, action.distance)
     default:
       return state
   }
@@ -108,6 +173,7 @@ const noTimeForTaxicab = (state = initialState, action) => {
 
 const createStore = (reducer, initialState) => {
   let state = initialState
+
   return (action) => {
       state = reducer(state, action)
       return state
@@ -127,3 +193,4 @@ input.map((instruction) =>
 const calculateDistanceToOrigin = (position) => Math.abs(position.x) + Math.abs(position.y)
 
 console.log(calculateDistanceToOrigin(finalState.position))
+console.log(calculateDistanceToOrigin(finalState.firstPositionVisitedTwice))
