@@ -1,7 +1,7 @@
 const input = ['883 357 185',
                '572 189 424',
                '842 206 272',
-               '55 656 94', //0,1,2 9,10,11 18,19,20 27,28,29
+               '55 656 94',
                '612 375 90',
                '663 550 179',
                '183 487 470',
@@ -1906,10 +1906,6 @@ const parsedInputForPart1 = input.map((sides) =>
     parseInt(side)
   )
 )
-
-// 0, 3, 6
-// 1, 4, 7
-// 2, 5, 8
 
 const allSides = parsedInputForPart1.reduce((a, b) => a.concat(b))
 
